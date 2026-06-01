@@ -1,75 +1,78 @@
-# 🕹️ Levels — Trudna Gra Platformowa (Godot / C#)
+# 🕹️ Levels — Zaawansowana Gra Platformowa (Godot 4 / C#)
 
 ![C#](https://img.shields.io/badge/C%23-.NET-purple?style=for-the-badge&logo=c-sharp&logoColor=white)
 ![Platform](https://img.shields.io/badge/Platform-Windows-blue?style=for-the-badge&logo=windows&logoColor=white)
 
-**Levels** to wymagająca dwuwymiarowa gra platformowa rozwijana w środowisku **Godot** przy użyciu języka **C#**. Głównym celem tego projektu było odejście od gotowych komponentów na rzecz napisania własnej, zaawansowanej logiki ruchu postaci (Physics Engine Bypass), zrozumienie architektury stanu gry (Game State) oraz optymalizacja struktury kodu pod kątem rozbudowy w architekturze obiektowej.
+**Levels** to wymagająca, precyzyjna gra platformowa 2D stworzona w środowisku **Godot Engine 4** przy użyciu języka **C#**. Głównym założeniem projektu było całkowite odejście od gotowych, silnikowych automatów ruchu na rzecz napisania własnej, deterministycznej logiki poruszania się postaci (Physics Engine Bypass), pełnego zrozumienia architektury stanów gry oraz wdrożenia czystych wzorców projektowych w środowisku obiektowym.
 
 ---
 
-## 🚀 Główne Wyzwania Techniczne i Funkcjonalności
+## 🚀 Kluczowe Rozwiązania Techniczne i Architektura
 
-Projekt nie jest jedynie prostą grą – to pokaz moich umiejętności programistycznych w C# i gamedevie. Skupiłem się w nim na następujących aspektach:
+Projekt służy jako poligon doświadczalny dla zaawansowanych mechanik gamedevu i inżynierii oprogramowania w C#. Skupiłem się w nim na następujących problemach:
 
-1. **Autorski Kontroler Postaci (Advanced Character Controller):**
-   * Precyzyjne programowanie fizyki skoku, grawitacji, bezwładności oraz tarcia.
-   * Zaawansowana detekcja podłoża (Ground Detection) oparta na rzucaniu promieni (*Raycasting* / *BoxCast*), co zapobiega powszechnym błędom utykania w ścianach.
+1. **Autorski Kontroler Fizyki Postaci (Advanced Kinematic Controller):**
+   * **Custom Movement Curve:** Napisanie od zera logiki grawitacji, twardego tarcia kinetycznego, bezwładności oraz asymetrycznej krzywej skoku (szybsze opadanie, zmienna wysokość skoku zależna od czasu wciśnięcia klawisza).
+   * **Gładka Interpolacja:** Wykorzystanie metod matematycznych (np. `MoveToward` / `Lerp`) do operacji na wektorach prędkości (`Vector2`), co eliminuje efekt "pływania" i zapewnia idealną responsywność.
+   * **Detekcja Środowiskowa:** Zaawansowana weryfikacja stanów `OnFloor` / `InAir` oparta o precyzyjną analizę kolizji, eliminująca błędy utykania postaci w geometriach pionowych.
+   * **Gamefeel Tweaks:** Implementacja niewidocznych buforów wejściowych (np. *Coyote Time* oraz *Jump Buffering*), drastycznie podnoszących komfort sterowania.
 
-2. **Architektura Stanu Gry (Game Architecture & Core Loop):**
-   * Wdrożenie czystego cyklu życia rozgrywki (ładowanie poziomu, resetowanie stanu po śmierci, płynne przejścia).
-   * Zastosowanie wzorców projektowych ułatwiających zarządzanie menedżerami gry (*GameManager*, *UIManager*).
+2. **Zarządzanie Stanem i Cyklem Życia Gry (Game Architecture & Core Loop):**
+   * Zastosowanie wzorca **Singleton** do implementacji globalnego menedżera gry (`GameManager`), który kontroluje cykl życia scen, asynchroniczny restart poziomów po kolizji oraz izolację danych sesji.
+   * Wykorzystanie architektury sterowanej zdarzeniami (**C# Events & Delegates**) do komunikacji między logiką gry a interfejsem użytkownika, realizując zasadę *Separation of Concerns*.
 
-3. **System Przeszkód i Interakcji:**
-   * Modularny system kolizji i triggerów obsługujący natychmiastową śmierć gracza, punkty kontrolne (*Checkpoints*) oraz warunki zwycięstwa.
+3. **Modularny System System Triggers & Hazards:**
+   * Oprogramowanie generycznego systemu wykrywania kolizji ze strefami śmierci, punktami kontrolnymi (*Checkpoints*) oraz obiektami interaktywnymi z użyciem masek kolizji (*Collision Layers / Masks*).
 
-4. **Dynamiczne UI (UI State Management):**
-   * Architektura interfejsu na bieżąco zliczająca czas rozgrywki, liczbę prób (licznik śmierci) oraz postęp w czasie rzeczywistym.
+4. **Odizolowany Interfejs Użytkownika (UI State Management):**
+   * System UI monitorujący i renderujący w czasie rzeczywistym parametry rozgrywki (licznik śmierci, milisekundowy stoper czasu rzeczywistego) bez obciążania głównego wątku pętli fizycznej.
 
 ---
 
 ## 🛠️ Technologie i Narzędzia
 
-* **Silnik gry:** Godot (wersja wspierająca LTS)
-* **Język programowania:** C# / .NET
+* **Silnik gry:** Godot Engine 4.x (wersja .NET Mono)
+* **Język programowania:** C# / .NET 6.0+
 * **Zarządzanie kodem:** Git / GitHub
-* **Podejście do kodu:** OOP (Programowanie Obiektowe), enkapsulacja logiki, separacja komponentów (Separation of Concerns).
+* **Paradygmat:** Programowanie Obiektowe (OOP), pełna enkapsulacja logiki, kompozycja ponad dziedziczeniem.
 
 ---
 
 ## 🎮 Sterowanie
 
-Rozgrywka opiera się na precyzji, do której wykorzystywane są klasyczne klawisze:
-* `Poruszanie się` — Klawisze <kbd>A</kbd> / <kbd>D</kbd> lub <kbd>Strzałki lewo</kbd> / <kbd>prawo</kbd>
+Rozgrywka wymaga chirurgicznej precyzji, do której wykorzystywane są następujące mapowania:
+* `Ruch w lewo / prawo` — Klawisze <kbd>A</kbd> / <kbd>D</kbd> lub <kbd>Strzałka w lewo</kbd> / <kbd>w prawo</kbd>
 * `Skok` — Klawisz <kbd>Spacja</kbd> / <kbd>W</kbd>
-* `Restart poziomu` — Automatyczny po skuszeniu lub dedykowany klawisz szybkiego restartu.
+* `Szybki restart` — Automatyczny po śmierci lub wywoływany natychmiastowo z poziomu kodu gry.
 
 ---
 
 ## 📦 Pobieranie i Uruchomienie (Dla Rekruterów)
 
-Gra jest skompilowana i gotowa do przetestowania na systemie Windows. 
+Projekt posiada skompilowaną wersję wykonywalną przygotowaną bezpośrednio pod system Windows:
 
-2. Pobierz najnowszą paczkę `.zip` (np. `Levels-v1.0.0-Windows.zip`).
-3. Rozpakuj archiwum i uruchom plik `Levels.exe`.
+1. Przejdź do zakładki **Releases** w tym repozytorium.
+2. Pobierz najnowszą paczkę produkcyjną (np. `Levels-v0.5.3-Alpha-Windows.zip`).
+3. Rozpakuj archiwum ZIP w dowolnym katalogu i uruchom plik główny `Levels.exe`.
 
-*Alternatywnie możesz sklonować to repozytorium i otworzyć projekt bezpośrednio w Godot Editor.*
+*Alternatywnie można sklonować repozytorium lokalnie i otworzyć plik `project.godot` bezpośrednio w edytorze Godot Engine (wymagane zainstalowane SDK .NET).*
 
 ---
 
-## 🗺️ Roadmap (Plany na Przyszłość)
+## 🗺️ Roadmap (Najbliższe Kamienie Milowe)
 
-Projekt jest stale rozwijany. W najbliższych wersjach planuję dodać:
-- [ ] **Zaawansowany Level Design:** Dodanie ruchomych platform, stref ze zmienioną grawitacją oraz portali.
-- [ ] **Audio System:** Implementacja dynamicznej ścieżki dźwiękowej reagującej na tempo gry.
+- [ ] **Dynamiczny Level Design:** Implementacja ruchomych platform obliczających i przekazujących swój wektor prędkości na postać gracza (dziedziczenie pędu).
+- [ ] **Asynchroniczne ładowanie:** Przebudowa menedżera scen na wielowątkowe ładowanie poziomów w tle przy użyciu mechanizmów `Async/Await` w C#.
+- [ ] **Audio System:** Dedykowany mikser audio obsługujący dynamiczne zmiany ścieżki dźwiękowej w zależności od stanu gracza.
 
 ---
 
 ## 👨‍💻 Autor
 
 **Michał Wojewnik**
-* Portfolio: [https://lontem2.github.io/index.html#]
-* LinkedIn: [https://www.linkedin.com/in/michał-wojewnik-759baa35b/]
-* E-mail: [wojewnikmichal@gmail.com]
+* **Portfolio:** [lontem2.github.io](https://lontem2.github.io/)
+* **LinkedIn:** [Michał Wojewnik](https://www.linkedin.com/in/micha%C5%82-wojewnik-759baa35b/)
+* **E-mail:** [wojewnikmichal@gmail.com](mailto:wojewnikmichal@gmail.com)
 
 ---
-*Projekt stworzony w celach naukowych i portfolio inżynieryjnego.*
+*Projekt rozwijany jako niezależne portfolio inżynieryjne i pokaz twardych umiejętności programistycznych w technologii .NET.*
